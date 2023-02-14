@@ -3,10 +3,10 @@ from __future__ import annotations
 
 class Producao:
     
-    def __init__(self, regra, derivacao) -> None:
+    def __init__(self, regra: str, derivacao: str, indice_ponto: int = -1) -> None:
         self.regra = regra
         self.derivacao = derivacao
-        self.indice_ponto = -1  # Indica que ponto não foi adicionado
+        self.indice_ponto = indice_ponto  # Indica que ponto não foi adicionado
         
 
     def __str__(self) -> str:
@@ -14,9 +14,8 @@ class Producao:
 
 
     def __eq__(self, outro: Producao) -> bool:
-        if self.regra == outro.regra and self.derivacao == outro.derivacao:
+        if self.regra == outro.regra and self.derivacao == outro.derivacao and self.indice_ponto == outro.indice_ponto:
             return True
-            
         return False
 
 

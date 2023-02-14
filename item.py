@@ -22,10 +22,9 @@ class Item:
 
 
     def __eq__(self, outro: Item) -> bool:
-        if self.anterior == outro.anterior:
-            for i in range(len(self.producoes)):
-                if self.producoes[i] != outro.producoes[i]:
-                    return False
+        for i in range(len(self.producoes)):
+            if self.producoes[i] != outro.producoes[i]:
+                return False
         
         return True
 
@@ -35,7 +34,7 @@ class Item:
         transicoes = []
         transicao = ""
 
-        for producao in self.__iter__():
+        for producao in self.producoes:
             transicao = producao.pegar_proximo()
             if transicao:
                 transicoes.append(transicao)

@@ -82,17 +82,47 @@ def verificar_fechamentos(producoes: list[Producao]) -> list[str]:
     return fechamentos
 
 
+def x(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
+    atual_copia = deepcopy(atual)
+    producoes_novo = []
+
+    producoes_novo.extend(shift(atual_copia, transicao))
+
+    simbolos_verificados = []
+    while True:
+        simbolos = verificar_fechamentos(producoes_novo)
+        
+        simbolos = set(simbolos)
+        simbolos_verificados = set(simbolos_verificados)
+
+        repetidos = list(simbolos_verificados.intersection(simbolos))  # Retorna uma lista com os simbolos repetidos
+
+        simbolos = list(simbolos)
+        simbolos_verificados = list(simbolos_verificados)
+
+        for repetido in repetidos:  # Remove todos os repetidos da lista de símbolos
+            simbolos = [i for i in simbolos if i != repetido]
+
+        simbolos_verificados.extend(simbolos)
+
+        for simbolo in simbolos:
+            producoes_novo.extend(calcular_fechamento(gramatica_estendida, simbolo))
+
+        return Item(atual, producoes_novo)
+
+
+
 # Gera um novo item dado uma transição para o novo item, o item atual que está gerando o novo e a gramática estendida para cálculo do fechamento
 def gerar_item_lr0(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
     copia_atual = deepcopy(atual)
-    novo = []
+    novo_producoes = []
 
-    novo.extend(shift(copia_atual, transicao))
+    novo_producoes.extend(shift(copia_atual, transicao))
     
     verificados = []
     sao_iguais = False
     while sao_iguais == False:  # Loop roda até terminar de calcular fechamentos
-        simbolos = verificar_fechamentos(novo)
+        simbolos = verificar_fechamentos(novo_producoes)
 
         if verificados == simbolos:  # Se os verificados forem iguais aos símbolos calculados, para o loop para evitar repetição infinita
             sao_iguais = True
@@ -100,27 +130,37 @@ def gerar_item_lr0(gramatica_estendida: Item, transicao: str, atual: Item) -> It
             verificados.extend(simbolos)
 
             for simbolo in simbolos:
-                novo.extend(calcular_fechamento(gramatica_estendida, simbolo))
+                novo_producoes.extend(calcular_fechamento(gramatica_estendida, simbolo))
 
-    return Item(atual, novo)
+    return Item(atual, novo_producoes)
+
+
+def eh_item_igual(itens: list[Item], verificar: Item) -> bool:
+    for item in itens:
+        if item == verificar:
+            return True
+    return False
 
 
 if __name__ == "__main__":
     itens = []
-    fila = []  # Adiciona itens na fila de execução. Apenas sai quando o item está completo e nenhuma outra operação será feita com o mesmo
+    fila = []
 
-    gramatica = ler_gramatica("exemplos/ex2.in")
-    estender_gramatica(gramatica)
+    gramatica_estendida = ler_gramatica("exemplos/ex3.in")
+    estender_gramatica(gramatica_estendida)
 
-    itens.append(construir_item_inicial(gramatica))
-    fila.append(itens[0])
+    itens.append(construir_item_inicial(gramatica_estendida))
+    fila.append(itens[-1])
 
-    atual = fila.pop(0)
+    while len(fila) > 0:
+        item_atual = fila.pop(0)
+        transicoes = item_atual.calcular_transicoes()
 
-    itens.append(gerar_item_lr0(gramatica, "a", atual))
-    fila.append(itens[0])
-
-    atual = fila.pop(0)
-
-    temp = gerar_item_lr0(gramatica, "a", atual)
-    print(temp)
+        for transicao in transicoes:
+            item_novo = x(gramatica_estendida, transicao, item_atual)
+            if not eh_item_igual(itens, item_novo):
+                itens.append(item_novo)
+                fila.append(itens[-1])
+        
+    imprimir(itens)
+    print(len(itens))
