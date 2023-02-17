@@ -142,11 +142,21 @@ def eh_item_igual(itens: list[Item], verificar: Item) -> bool:
     return False
 
 
+def imprimir_itens(itens: list[Item]) -> None:
+    i = 0
+    while i < len(itens):
+        print(f"====== Item {i} ======")
+        print(itens[i])
+        print(f"===================\n")
+
+        i += 1
+
+
 if __name__ == "__main__":
     itens = []
     fila = []
 
-    gramatica_estendida = ler_gramatica("exemplos/ex3.in")
+    gramatica_estendida = ler_gramatica("exemplos/ex1.in")
     estender_gramatica(gramatica_estendida)
 
     itens.append(construir_item_inicial(gramatica_estendida))
@@ -162,5 +172,4 @@ if __name__ == "__main__":
                 itens.append(item_novo)
                 fila.append(itens[-1])
         
-    imprimir(itens)
-    print(len(itens))
+    imprimir_itens(itens)
