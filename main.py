@@ -1,6 +1,7 @@
 from producao import Producao
 from item import Item
 from copy import deepcopy
+from os.path import isfile
 
 
 # Recebe um arquivo com uma gramática no formato "S -> Aa | bb" e converte para objeto do tipo "Item"
@@ -153,23 +154,32 @@ def imprimir_itens(itens: list[Item]) -> None:
 
 
 if __name__ == "__main__":
-    itens = []
-    fila = []
+    arquivo = "exemplos/"
+    arquivo += input("Digite o nome do arquivo de exemplo que deseja gerar os itens: ")
 
-    gramatica_estendida = ler_gramatica("exemplos/ex1.in")
-    estender_gramatica(gramatica_estendida)
+    if isfile(arquivo):
+        itens = []
+        fila = []
 
-    itens.append(construir_item_inicial(gramatica_estendida))
-    fila.append(itens[-1])
+        print(f"{arquivo} selecionado.")
 
-    while len(fila) > 0:
-        item_atual = fila.pop(0)
-        transicoes = item_atual.calcular_transicoes()
+        gramatica_estendida = ler_gramatica("exemplos/ex1.in")
+        estender_gramatica(gramatica_estendida)
 
-        for transicao in transicoes:
-            item_novo = x(gramatica_estendida, transicao, item_atual)
-            if not eh_item_igual(itens, item_novo):
-                itens.append(item_novo)
-                fila.append(itens[-1])
-        
-    imprimir_itens(itens)
+        itens.append(construir_item_inicial(gramatica_estendida))
+        fila.append(itens[-1])
+
+        while len(fila) > 0:
+            item_atual = fila.pop(0)
+            transicoes = item_atual.calcular_transicoes()
+
+            for transicao in transicoes:
+                item_novo = x(gramatica_estendida, transicao, item_atual)
+                if not eh_item_igual(itens, item_novo):
+                    itens.append(item_novo)
+                    fila.append(itens[-1])
+            
+        imprimir_itens(itens)
+    else:
+        print(f"{arquivo} nao existe.")
+
