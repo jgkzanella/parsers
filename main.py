@@ -83,7 +83,7 @@ def verificar_fechamentos(producoes: list[Producao]) -> list[str]:
     return fechamentos
 
 
-def x(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
+def gerar_item_lr0(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
     atual_copia = deepcopy(atual)
     producoes_novo = []
 
@@ -110,30 +110,6 @@ def x(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
             producoes_novo.extend(calcular_fechamento(gramatica_estendida, simbolo))
 
         return Item(atual, producoes_novo)
-
-
-
-# Gera um novo item dado uma transição para o novo item, o item atual que está gerando o novo e a gramática estendida para cálculo do fechamento
-def gerar_item_lr0(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
-    copia_atual = deepcopy(atual)
-    novo_producoes = []
-
-    novo_producoes.extend(shift(copia_atual, transicao))
-    
-    verificados = []
-    sao_iguais = False
-    while sao_iguais == False:  # Loop roda até terminar de calcular fechamentos
-        simbolos = verificar_fechamentos(novo_producoes)
-
-        if verificados == simbolos:  # Se os verificados forem iguais aos símbolos calculados, para o loop para evitar repetição infinita
-            sao_iguais = True
-        else:
-            verificados.extend(simbolos)
-
-            for simbolo in simbolos:
-                novo_producoes.extend(calcular_fechamento(gramatica_estendida, simbolo))
-
-    return Item(atual, novo_producoes)
 
 
 def eh_item_igual(itens: list[Item], verificar: Item) -> bool:
@@ -174,7 +150,7 @@ if __name__ == "__main__":
             transicoes = item_atual.calcular_transicoes()
 
             for transicao in transicoes:
-                item_novo = x(gramatica_estendida, transicao, item_atual)
+                item_novo = gerar_item_lr0(gramatica_estendida, transicao, item_atual)
                 if not eh_item_igual(itens, item_novo):
                     itens.append(item_novo)
                     fila.append(itens[-1])
