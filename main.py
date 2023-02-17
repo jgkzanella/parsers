@@ -84,32 +84,25 @@ def verificar_fechamentos(producoes: list[Producao]) -> list[str]:
 
 
 def gerar_item_lr0(gramatica_estendida: Item, transicao: str, atual: Item) -> Item:
-    atual_copia = deepcopy(atual)
-    producoes_novo = []
+    copia_atual = deepcopy(atual)
+    novo_producoes = []
 
-    producoes_novo.extend(shift(atual_copia, transicao))
+    novo_producoes.extend(shift(copia_atual, transicao))
+    
+    verificados = []
+    sao_iguais = False
+    while sao_iguais == False:  # Loop roda até terminar de calcular fechamentos
+        simbolos = verificar_fechamentos(novo_producoes)
 
-    simbolos_verificados = []
-    while True:
-        simbolos = verificar_fechamentos(producoes_novo)
-        
-        simbolos = set(simbolos)
-        simbolos_verificados = set(simbolos_verificados)
+        if verificados == simbolos:  # Se os verificados forem iguais aos símbolos calculados, para o loop para evitar repetição infinita
+            sao_iguais = True
+        else:
+            verificados.extend(simbolos)
 
-        repetidos = list(simbolos_verificados.intersection(simbolos))  # Retorna uma lista com os simbolos repetidos
+            for simbolo in simbolos:
+                novo_producoes.extend(calcular_fechamento(gramatica_estendida, simbolo))
 
-        simbolos = list(simbolos)
-        simbolos_verificados = list(simbolos_verificados)
-
-        for repetido in repetidos:  # Remove todos os repetidos da lista de símbolos
-            simbolos = [i for i in simbolos if i != repetido]
-
-        simbolos_verificados.extend(simbolos)
-
-        for simbolo in simbolos:
-            producoes_novo.extend(calcular_fechamento(gramatica_estendida, simbolo))
-
-        return Item(atual, producoes_novo)
+    return Item(atual, novo_producoes)
 
 
 def eh_item_igual(itens: list[Item], verificar: Item) -> bool:
@@ -139,7 +132,7 @@ if __name__ == "__main__":
 
         print(f"{arquivo} selecionado.")
 
-        gramatica_estendida = ler_gramatica("exemplos/ex1.in")
+        gramatica_estendida = ler_gramatica(arquivo)
         estender_gramatica(gramatica_estendida)
 
         itens.append(construir_item_inicial(gramatica_estendida))
